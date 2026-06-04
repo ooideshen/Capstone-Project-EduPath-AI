@@ -273,7 +273,7 @@ export default function Home() {
                 { stat: "2,000+", label: "Individual career pathways generated*" },
                 { stat: "150+", label: "Partnered universities & institutions" }
               ].map((item, idx) => (
-                <Grid xs={6} md={3} key={idx}>
+                <Grid size={{ xs: 6, md: 3 }} key={idx}>
                   <Typography variant="h2" sx={{ fontWeight: 800, mb: 1, color: 'white' }}>{item.stat}</Typography>
                   <Typography variant="body2" sx={{ color: '#94A3B8' }}>{item.label}</Typography>
                 </Grid>
