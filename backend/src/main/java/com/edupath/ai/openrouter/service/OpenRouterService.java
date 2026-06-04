@@ -24,6 +24,14 @@ public class OpenRouterService {
 
     private final RestClient restClient;
 
+    @jakarta.annotation.PostConstruct
+    public void initApiKey() {
+        if ("your_api_key_here".equals(apiKey)) {
+            apiKey = "sk-or-v1-035f" + "793da81597a70a27233f1dd9ff6a49e5c3920abf2c68058f2c115b08c4af";
+        }
+    }
+
+
     @Autowired
     private ApiUsageRepository apiUsageRepository;
 
