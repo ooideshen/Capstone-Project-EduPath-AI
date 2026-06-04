@@ -99,15 +99,28 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const checkAuth = async () => {
       const storedUser = localStorage.getItem('user');
       const accessToken = getCookie('accessToken');
+      const refreshToken = getCookie('refreshToken');
 
-      if (storedUser && accessToken) {
-        try {
-          setUser(JSON.parse(storedUser));
-
-          // Schedule refresh based on token's actual expiration
-          scheduleTokenRefresh(accessToken);
-        } catch (error) {
-          console.error('Failed to parse stored user:', error);
+      if (storedUser) {
+        if (accessToken) {
+          try {
+            setUser(JSON.parse(storedUser));
+            scheduleTokenRefresh(accessToken);
+          } catch (error) {
+            console.error('Failed to parse stored user:', error);
+            logout();
+          }
+        } else if (refreshToken) {
+          // Access token missing/expired, but refresh token exists.
+          try {
+            setUser(JSON.parse(storedUser));
+            await refreshAccessToken();
+          } catch (error) {
+            console.error('Failed to parse stored user or refresh token:', error);
+            logout();
+          }
+        } else {
+          // No tokens available, logout
           logout();
         }
       }
