@@ -2,6 +2,7 @@ services:
   - type: web
     name: edupath-ai-backend
     env: docker
+    plan: free
     dockerContext: backend
     dockerfilePath: ./backend/Dockerfile
     envVars:
