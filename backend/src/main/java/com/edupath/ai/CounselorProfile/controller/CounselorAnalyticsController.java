@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/counselor/analytics")
-@CrossOrigin(origins = "http://localhost:3000")
+
 public class CounselorAnalyticsController {
 
     private final CounselorAnalyticsRepository analyticsRepository;

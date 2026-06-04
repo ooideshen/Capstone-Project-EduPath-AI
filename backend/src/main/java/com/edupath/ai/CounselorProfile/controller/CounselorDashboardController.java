@@ -7,7 +7,7 @@ import java.util.*;
 
 @RestController
 @RequestMapping("/api/counselor")
-@CrossOrigin(origins = "http://localhost:3000")
+
 public class CounselorDashboardController {
 
     @Autowired

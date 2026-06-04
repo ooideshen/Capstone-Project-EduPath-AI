@@ -14,7 +14,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/counselor/analytics")
-@CrossOrigin(origins = "http://localhost:3000")
+
 public class AcademicPipelineController {
 
     private final com.edupath.ai.users.repository.UsersRepository usersRepository;

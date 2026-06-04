@@ -15,7 +15,7 @@ import java.util.Map;
 import java.util.HashMap;
 
 @RestController
-@CrossOrigin(origins = "http://localhost:3000")
+
 @RequestMapping("/api/open-router")
 public class OpenRouterController {
     @Autowired

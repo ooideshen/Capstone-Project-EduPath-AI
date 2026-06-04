@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/counselor/student-list")
-@CrossOrigin(origins = "http://localhost:3000")
+
 public class CounselorStudentController {
 
     private final UsersRepository usersRepository;
