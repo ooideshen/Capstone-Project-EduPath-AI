@@ -27,5 +27,5 @@ services:
 databases:
   - name: edupath-db
     databaseName: edupath_ai_db
-    user: postgres
     plan: free
+
