@@ -42,7 +42,6 @@ const subjectsList = [
 
 const spmGradeOptions = [
   { value: '0', label: 'Not Taken' },
-  { value: 'N/A', label: 'Not Taken' },
   { value: 'A+', label: 'A+' },
   { value: 'A', label: 'A' },
   { value: 'A-', label: 'A-' },
@@ -57,7 +56,6 @@ const spmGradeOptions = [
 
 const uecGradeOptions = [
   { value: '0', label: 'Not Taken' },
-  { value: 'N/A', label: 'Not Taken' },
   { value: 'A1', label: 'A1' },
   { value: 'A2', label: 'A2' },
   { value: 'B3', label: 'B3' },
