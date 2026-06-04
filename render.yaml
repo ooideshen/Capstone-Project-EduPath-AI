@@ -1,0 +1,31 @@
+services:
+  - type: web
+    name: edupath-ai-backend
+    env: docker
+    dockerContext: backend
+    dockerfilePath: ./backend/Dockerfile
+    envVars:
+      - key: DB_URL
+        fromDatabase:
+          name: edupath-db
+          property: connectionString
+      - key: DB_USERNAME
+        fromDatabase:
+          name: edupath-db
+          property: user
+      - key: DB_PASSWORD
+        fromDatabase:
+          name: edupath-db
+          property: password
+      - key: JWT_SECRET
+        generateValue: true
+      - key: OPENROUTER_API_KEY
+        sync: false
+      - key: FRONTEND_URL
+        sync: false
+
+databases:
+  - name: edupath-db
+    databaseName: edupath_ai_db
+    user: postgres
+    plan: free
