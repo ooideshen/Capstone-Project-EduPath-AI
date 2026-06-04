@@ -80,7 +80,7 @@ export default function StudentProfilePage() {
         }
       })
       .finally(() => {
-        Loading(false);
+        setLoading(false);
       });
     } catch (e) {
       console.error("Session parse error", e);
