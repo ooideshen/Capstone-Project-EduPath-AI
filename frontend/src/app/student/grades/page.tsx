@@ -41,6 +41,8 @@ const subjectsList = [
 ];
 
 const spmGradeOptions = [
+  { value: '0', label: 'Not Taken' },
+  { value: 'N/A', label: 'Not Taken' },
   { value: 'A+', label: 'A+' },
   { value: 'A', label: 'A' },
   { value: 'A-', label: 'A-' },
@@ -54,6 +56,8 @@ const spmGradeOptions = [
 ];
 
 const uecGradeOptions = [
+  { value: '0', label: 'Not Taken' },
+  { value: 'N/A', label: 'Not Taken' },
   { value: 'A1', label: 'A1' },
   { value: 'A2', label: 'A2' },
   { value: 'B3', label: 'B3' },
@@ -91,6 +95,49 @@ export default function GradesPage() {
       }
     }
   }, []);
+
+  useEffect(() => {
+    if (!userId) return;
+
+    const fetchExistingGrades = async () => {
+      try {
+        const token = getCookie('accessToken');
+        const config = {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        };
+        const res = await axios.get(`${API_URL}/api/StudentProfile/user/${userId}`, config);
+        const profile = res.data;
+        if (profile?.academicAssessment) {
+          const aa = profile.academicAssessment;
+          setTrack(aa.track || 'SPM');
+          setGrades({
+            malayGrade: aa.malayGrade || '',
+            englishGrade: aa.englishGrade || '',
+            historyGrade: aa.historyGrade || '',
+            moralGrade: aa.moralGrade || '',
+            mathematicGrade: aa.mathematicGrade || '',
+            scienceGrade: aa.scienceGrade || '',
+            addMathGrade: aa.addMathGrade || '',
+            physicGrade: aa.physicGrade || '',
+            chemistryGrade: aa.chemistryGrade || '',
+            biologyGrade: aa.biologyGrade || '',
+            chineseGrade: aa.chineseGrade || '',
+            businessGrade: aa.businessGrade || '',
+            accountingGrade: aa.accountingGrade || '',
+            economicGrade: aa.economicGrade || '',
+            artGrade: aa.artGrade || '',
+            computerGrade: aa.computerGrade || ''
+          });
+        }
+      } catch (err) {
+        console.error("Failed to load existing grades", err);
+      }
+    };
+
+    fetchExistingGrades();
+  }, [userId]);
 
   const handleTrackChange = (newTrack: string) => {
     setTrack(newTrack);

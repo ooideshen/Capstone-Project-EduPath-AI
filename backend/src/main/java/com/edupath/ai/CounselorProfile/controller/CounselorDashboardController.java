@@ -85,7 +85,7 @@ public class CounselorDashboardController {
         data.put("totalAssessments", jdbcTemplate.queryForObject("""
         SELECT COUNT(*)
         FROM users u
-        JOIN student_profile sp ON u.id = sp.user_id
+        JOIN student_profile sp ON u.student_profile_id = sp.id
         WHERE u.role = 'STUDENT'
         AND sp.personality_assessmentid IS NOT NULL
         """, Integer.class));
@@ -93,11 +93,12 @@ public class CounselorDashboardController {
         data.put("atRiskStudents", jdbcTemplate.queryForObject("""
         SELECT COUNT(*)
         FROM users u
-        JOIN student_profile sp ON u.id = sp.user_id
+        JOIN student_profile sp ON u.student_profile_id = sp.id
         WHERE u.role = 'STUDENT'
         AND sp.personality_assessmentid IS NOT NULL
         AND sp.ai_reality_report IS NOT NULL
         """, Integer.class));
+
 
         data.put("topRIASECTrait", jdbcTemplate.queryForObject("""
         SELECT label
@@ -185,7 +186,7 @@ public class CounselorDashboardController {
                     List<Map<String, Object>> students = jdbcTemplate.queryForList("""
                 SELECT u.id, u.name, u.email
                 FROM users u
-                LEFT JOIN student_profile sp ON u.id = sp.user_id
+                LEFT JOIN student_profile sp ON u.student_profile_id = sp.id
                 WHERE u.role = 'STUDENT'
                 AND sp.personality_assessmentid IS NULL
                 ORDER BY u.id
@@ -240,7 +241,7 @@ public class CounselorDashboardController {
             List<Map<String, Object>> students = jdbcTemplate.queryForList("""
             SELECT u.id, u.name, u.email
             FROM users u
-            LEFT JOIN student_profile sp ON u.id = sp.user_id
+            LEFT JOIN student_profile sp ON u.student_profile_id = sp.id
             WHERE u.role = 'STUDENT'
             AND sp.ai_reality_report IS NOT NULL
             ORDER BY u.id
@@ -302,7 +303,7 @@ public class CounselorDashboardController {
             List<Map<String, Object>> students = jdbcTemplate.queryForList("""
         SELECT u.id, u.name, u.email
         FROM users u
-        LEFT JOIN student_profile sp ON u.id = sp.user_id
+        LEFT JOIN student_profile sp ON u.student_profile_id = sp.id
         WHERE u.role = 'STUDENT'
         AND sp.personality_assessmentid IS NULL
     """);
@@ -326,7 +327,7 @@ public class CounselorDashboardController {
             List<Map<String, Object>> students = jdbcTemplate.queryForList("""
             SELECT u.id, u.name, u.email
             FROM users u
-            LEFT JOIN student_profile sp ON u.id = sp.user_id
+            LEFT JOIN student_profile sp ON u.student_profile_id = sp.id
             WHERE u.role = 'STUDENT'
             AND sp.personality_assessmentid IS NULL
             ORDER BY u.id

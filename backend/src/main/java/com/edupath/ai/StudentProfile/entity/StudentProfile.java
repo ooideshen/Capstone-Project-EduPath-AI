@@ -45,7 +45,6 @@ public class StudentProfile {
     @JsonIgnore
     private Collection<StudentPathway> studentPathway;
 
-    @OneToOne
-    @JoinColumn(name = "user_id")
+    @OneToOne(mappedBy = "studentProfile")
     private Users users;
 }
