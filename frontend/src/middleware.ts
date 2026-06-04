@@ -1,11 +1,39 @@
-// src/proxy.ts
+// src/middleware.ts
 import { NextRequest, NextResponse } from 'next/server';
-import { jwtVerify } from 'jose';
 import { API_URL } from '@/app/utils/api';
 
-const secret = new TextEncoder().encode(process.env.NEXT_PUBLIC_JWT_SECRET || "0edddeea31fc1daebc1a6814311a5c2a9bc6e860b7e6a8d79428d0e98d055306");
+/**
+ * Simplified middleware: checks cookie existence + decodes JWT payload (without
+ * cryptographic verification) for RBAC routing.  Full token validation is
+ * performed server-side by the Spring Boot backend on every API call.
+ *
+ * Why no crypto verification here?
+ *  - The JWT secret lives only on the backend (Render).  Exposing it via
+ *    NEXT_PUBLIC_* would leak it to the browser.
+ *  - The middleware's job is UX route-guarding, not security enforcement.
+ */
 
-export async function proxy(request: NextRequest) {
+function decodeTokenPayload(token: string): Record<string, unknown> | null {
+  try {
+    const parts = token.split('.');
+    if (parts.length !== 3) return null;
+    // Base64url → Base64 → decode
+    const base64 = parts[1].replace(/-/g, '+').replace(/_/g, '/');
+    const json = atob(base64);
+    return JSON.parse(json);
+  } catch {
+    return null;
+  }
+}
+
+function isTokenExpired(payload: Record<string, unknown>): boolean {
+  const exp = payload.exp as number | undefined;
+  if (!exp) return true;
+  // exp is in seconds, Date.now() in ms
+  return Date.now() >= exp * 1000;
+}
+
+export async function middleware(request: NextRequest) {
   const token = request.cookies.get('accessToken')?.value;
   const refreshToken = request.cookies.get('refreshToken')?.value;
   const pathname = request.nextUrl.pathname;
@@ -13,28 +41,25 @@ export async function proxy(request: NextRequest) {
   const publicRoutes = ['/', '/login', '/signup', '/forgot-password'];
   const isPublicPage = publicRoutes.includes(pathname);
 
+  let payload: Record<string, unknown> | null = null;
   let isTokenValid = false;
-  let decodedPayload: any = null;
 
   if (token) {
-    try {
-      const { payload } = await jwtVerify(token, secret);
+    payload = decodeTokenPayload(token);
+    if (payload && !isTokenExpired(payload)) {
       isTokenValid = true;
-      decodedPayload = payload;
-    } catch {
-      isTokenValid = false;
     }
   }
 
   // --- 1. IF TOKEN IS VALID, ENFORCE RBAC DIRECTLY ---
-  if (isTokenValid && decodedPayload) {
-    const role = (decodedPayload.role || '').toLowerCase();
-    
+  if (isTokenValid && payload) {
+    const role = ((payload.role as string) || '').toLowerCase();
+
     // If they have a role, redirect away from public pages
     if (isPublicPage && role) {
       return NextResponse.redirect(new URL(`/${role}/overview`, request.url));
     }
-    
+
     // If they have a token but NO role, let them stay on public pages (like /login)
     // to prevent infinite loops. If they are on a protected page, force them to login.
     if (!role) {
@@ -83,15 +108,12 @@ export async function proxy(request: NextRequest) {
       }
 
       const data = await refreshResponse.json();
-      
+
       // Parse new token to get role
       let newRole = '';
-      try {
-        const payloadStr = atob(data.accessToken.split('.')[1]);
-        const responsePayload = JSON.parse(payloadStr);
-        newRole = (responsePayload.role || '').toLowerCase();
-      } catch (e) {
-        console.error('Failed to parse refreshed token', e);
+      const newPayload = decodeTokenPayload(data.accessToken);
+      if (newPayload) {
+        newRole = ((newPayload.role as string) || '').toLowerCase();
       }
 
       const fallbackUrl = newRole ? `/${newRole}/overview` : '/login';
@@ -106,11 +128,11 @@ export async function proxy(request: NextRequest) {
       }
 
       const response = redirectUrl ? NextResponse.redirect(redirectUrl) : NextResponse.next();
-      
+
       response.cookies.set('accessToken', data.accessToken, {
-        httpOnly: true,
+        httpOnly: false,
         secure: process.env.NODE_ENV === 'production',
-        sameSite: 'strict',
+        sameSite: 'lax',
         maxAge: data.expiresIn / 1000,
       });
 
