@@ -6,10 +6,18 @@ services:
     dockerContext: backend
     dockerfilePath: ./backend/Dockerfile
     envVars:
-      - key: DB_URL
+      - key: DB_HOST
         fromDatabase:
           name: edupath-db
-          property: connectionString
+          property: host
+      - key: DB_PORT
+        fromDatabase:
+          name: edupath-db
+          property: port
+      - key: DB_NAME
+        fromDatabase:
+          name: edupath-db
+          property: database
       - key: DB_USERNAME
         fromDatabase:
           name: edupath-db
